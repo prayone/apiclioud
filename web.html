@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="./css/api.css"/>
+    <style>
+    	body{
+    		
+    	}
+    </style>
+</head>
+<body>
+	
+</body>
+<script type="text/javascript" src="./script/api.js"></script>
+<script type="text/javascript" src="./script/conf.js"></script>
+<script type="text/javascript" src="./script/HttpClient.js"></script>
+<script type="text/javascript">
+	apiready = function(){
+		api.openFrame({
+	        name: 'aa',
+	        url: BASE_URL+'/a/tongchuan/tjcx/njhtzlist028',
+	        headers:{
+	        	'Cookie':'zjkjrdp.session.id='+getUser().sessionid,
+	        	'User-Agent' : 'Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1'
+	        },
+	        rect: {
+		        x:0,
+		        y:0,
+		        w:'auto',
+		        h:'auto'
+	        }
+        });
+		
+	};
+</script>
+</html>

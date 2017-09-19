@@ -1,0 +1,133 @@
+<!DOCTYPE html>		
+<html>		
+<head>		
+	<meta charset="utf-8">		
+	<title>frame</title>		
+	<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>		
+	<meta name="format-detection" content="telephone=no,email=no,date=no,address=no">		
+	<link rel="stylesheet" type="text/css" href="../../css/api.css" />		
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />		
+    <style>		
+		.home-tuan-list{
+			margin-top:5px;
+			
+		}
+		.home-tuan-list .item {position: relative; display: block; padding-left: 10px; border-bottom: 1px solid #e0e0e0;}			
+		.home-tuan-list .cnt {padding: 7px 10px 10px 0; display: box; display: -webkit-box;			
+		display: -webkit-flex;display: flex; min-height: 78px;  background-size: auto 1px; }			
+		.home-tuan-list .pic {margin-right: 10px; background: center; }			
+		.home-tuan-list img {width: 90px; height: 66px; margin-top: 7px; margin-bottom: 5px; border-radius: 3px; }			
+		.home-tuan-list .wrap {-webkit-box-flex: 1;-webkit-flex: 1;flex: 1; }			
+		.home-tuan-list .wrap2 {display: table; height: 88px; width: 100%; }			
+		.home-tuan-list .content {-webkit-box-flex: 1; -webkit-flex: 1;flex: 1; display: table-cell; vertical-align: middle; }			
+		.home-tuan-list .shopname {color: #333; /*line-height: 16px;*/ font-size: 17px; max-width: 11em; white-space: nowrap; word-wrap: normal; text-overflow: ellipsis; overflow: hidden; min-height: 10px; padding-bottom: 2px; padding-top: 3px; display: inline-block;}			
+		.home-tuan-list .title {color: #999; line-height: 16px; font-size: 13px; max-height: 30px; overflow: hidden; padding-top: 3px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;-webkit-flex-flow: column;flex-flow: column; }			
+	</style>		
+</head>		
+<body>				
+	<div class="home-tuan-list" id="list1">		
+        
+	</div>
+</body>		
+<script type="text/javascript" src="../../script/api.js"></script>		
+<script type="text/javascript" src="../../script/swipe.js"></script>	
+<script type="text/javascript" src="../../script/doT.js"></script>	
+<script type="text/javascript" src="../../script/HttpClient.js"></script>	
+<script type="text/javascript" src="../../script/jquery2.min.js"></script>	
+<script type="text/javascript" src="../../script/conf.js"></script>	
+<script type="text/x-dot-template" id="XM_List">
+	{{~ it.page:f:index}}
+	 <a href="#" class="item Fix hightitem" onclick="xmxq('{{=f.id}}')" >	
+            <div class="cnt">		
+            	<img class="pic" src="{{=it.URL}}{{=f.xmMainFileList[0].sctplj}}">		
+	            <div class="wrap">		
+		            <div class="wrap2">		
+			            <div class="content">		
+			                <div class="shopname">{{=f.xmmc}}</div>		
+			                <!--<div>概算投资</div>-->
+			                <div class="title">{{=f.jsnr}}</div>			
+			            </div>		
+		            </div>           		
+	            </div>		
+            </div>		
+        </a>
+        {{~}}
+</script>
+<script>	
+function xmxq(id){
+			  var obj={};
+			  obj.xq=id;
+			openWin("../zjxmxq/ldbz_window",obj);
+			}	
+	var xq = {},page=2;
+			apiready = function() {
+			var username=getUser().loginName;
+			var password=getUser().password;
+			if(username==""){
+				username=="tcs_qiye";
+				password=='admin123';
+			}
+				api.parseTapmode();
+				pulldown(function() {
+					api.ajax({
+						url : LOGINRUL,
+						method : 'POST',
+						dataType : 'json',
+						headers : {
+							"User-Agent" : "Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1"
+						},
+						data : {
+							values : {
+								sessionid : "",
+								password : password,
+								username : username,
+								mobileLogin : 'true',
+								rememberMe : 'true'
+							}
+						}
+					}, function(result, err) {
+						console.log(JSON.stringify(result));
+						if(result)
+						setUser(result.id, result.loginName, "admin123", result.name, result.sessionid);
+					});
+					page = 2;
+				
+					JsonData.pageSize = 10;
+					JsonData.pageNo = 1;
+					JsonData.sessionid=getUser().sessionid;
+				
+					httpClient(ZJSJLDBZ, JsonData, function(result) {
+						stoppull();
+						result.URL=BASE_URL;
+						$('#list1').empty().append(doT.compile($("#XM_List").html())(result));
+						
+						
+						console.log("--->" + JSON.stringify(result));
+					});
+				});
+				initpull();
+				pullupper(function() {
+					JsonData.pageSize = 10;
+					JsonData.pageNo = page;
+					sessionid = getUser().sessionid;
+					httpClient(ZJSJLDBZ, JsonData, function(result) {
+					stoppull();
+					var sum=(Math.ceil((result.page.count)/10));
+					if(page>sum){
+					ts('无更多内容...'+page);
+					}
+						else {
+						console.log("上拉---〉" + JSON.stringify(result));
+						result.URL=BASE_URL;
+						$('#list1').append(doT.compile($("#XM_List").html())(result));
+						console.log(result)
+						
+						page++;
+						}	
+					});
+					
+					ts('加载中...');
+				});
+			}
+</script>		
+</html>		

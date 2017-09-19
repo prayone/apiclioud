@@ -1,0 +1,110 @@
+<!doctype html>		
+<html>		
+  <head>		
+    <meta charset="utf-8">		
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>		
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">		
+    <title>window</title>		
+    <link rel="stylesheet" type="text/css" href="../../css/api.css" />		
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />			
+    <style>			
+     .topbar .title {text-align: center;font-size: 20px;background-color: #31A4F6;height: 50px;padding:35px 0 45px 0;color:#fff;}		
+    .icon{
+    	font-size:18px;
+    	font-weight: 800;
+    	margin-top: 5px;
+    	margin-left:10px;
+    }
+    </style>		
+  </head>		
+  <body>
+    <header class="aui-bar aui-bar-nav aui-bar-dark" id="aui-header">
+        <a class="aui-btn aui-btn-dark aui-pull-left" id="back" onclick="closeWin()">
+            <span class="aui-iconfont aui-icon-left"></span>
+        </a>
+        <div class="aui-title" id="title"></div>
+        
+    </header>
+</body>	
+  <script type="text/javascript" src="../../script/api.js"></script>	
+  <script type="text/javascript" src="../../script/HttpClient.js"></script>		
+    <script type="text/javascript" src="../../script/conf.js"></script>		
+    <script type="text/javascript" src="../../script/jquery.min.js"></script>	
+  <script type="text/javascript">		
+    apiready = function(){	
+      var url=api.pageParam.url;
+      var title=api.pageParam.title;	
+      $('#title').html(title);
+        var winHeight = api.winHeight;
+        var header = $api.byId('aui-header');
+        $api.fixStatusBar(header);    
+        var headerPos = $api.offset(header);
+        var body_h = $api.offset($api.dom('body')).h;	
+      
+      
+      
+      
+      if ( typeof (getUser()) != "undefined" && typeof (getUser().loginName) != "undefined") {
+						username = getUser().loginName;
+						password = getUser().password;
+						//alert('if-->'+username+password);
+					} else {
+						username = "tcs_qiye";
+						password = 'admin123';
+					}
+					api.ajax({
+						url : LOGINRUL,
+						method : 'POST',
+						dataType : 'json',
+						headers : {
+							"Cookie":"zjkjrdp.session.id=",
+							"Content-Type" : "application/x-www-form-urlencoded",
+							"User-Agent" : "Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1"
+						},
+						data : {
+							values : {
+								login:'login',
+								password : password,
+								username : username,
+								mobileLogin : 'true',
+								rememberMe : 'true'
+							}
+						}
+					}, function(result, err) {
+						console.log(JSON.stringify(result));
+						console.log(JSON.stringify(err));
+						if(result)
+						setUser(result.id, result.loginName, password, result.name, result.sessionid);
+						   api.openFrame ({		
+            name: 'chbz_frame1',		
+            url: BASE_URL+url,		
+            headers:{
+	        	'Cookie':'zjkjrdp.session.id='+getUser().sessionid,
+	        	'User-Agent' : 'Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1'
+	        },
+            rect:{		
+                x:0,		
+                y:headerPos.h,		
+                w:'auto',		
+                h:'auto'		
+            },		
+            bounces: false,		
+            delay:200		
+        });	
+						
+					});
+      
+      
+   	
+        
+        
+        
+        
+    };	
+     function closeWin(){
+        api.closeWin({
+        });
+    }	
+  </script>		
+</html>		

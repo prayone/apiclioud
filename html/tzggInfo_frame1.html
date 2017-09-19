@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>frame</title>
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+		<meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+		<link rel="stylesheet" type="text/css" href="../css/api.css" />
+		<link rel="stylesheet" type="text/css" href="../css/common.css" />
+		<link rel="stylesheet" href="../bootstrap/bootstrap.min.css" />
+		<link rel="stylesheet" href="../css/aui.2.0.css" />
+		<style>
+			#XWInfo {
+				padding: 15px;
+				padding-top:25px;
+			}
+			#XWInfo li {
+				height: 60px;
+				border-bottom: 1px solid #eee;
+				padding: 5px 0;
+				padding-bottom: 8px;
+			}
+			.newsList .bt {
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				width: 100%;
+				color: #444;
+				font-size: 16px;
+			}
+			.newsList .timer {
+				font-size: 14px;
+				color: #999;
+						}
+		</style>
+	</head>
+	<body>
+		<div class="news">
+			<div class="tcgk"></div>
+			<ul id="XWInfo"></ul>
+		</div>
+	</body>
+	<script type="text/javascript" src="../script/api.js"></script>
+	<script type="text/javascript" src="../script/doT.js"></script>
+	<script type="text/javascript" src="../script/HttpClient.js"></script>
+	<script type="text/javascript" src="../script/jquery2.min.js"></script>
+	<script type="text/javascript" src="../script/conf.js"></script>
+	<!--新闻中心-->
+	<script type="text/x-dot-template" id="XWZX_List">
+		{{~ it.page.list:f:index}}
+		<li class="newsList">
+		<p class="bt"  onclick="openxq('{{=f.id}}')">{{=f.ggbt}}</p>
+		<p class="text-right timer">{{=f.ggtime}}</p>
+		</li>
+		{{~}}
+	</script>
+	<script>
+		var xq = {}, page = 2;
+		apiready = function() {
+			api.parseTapmode();
+			pulldown(function() {
+				api.ajax({
+					url : LOGINRUL,
+					method : 'POST',
+					dataType : 'json',
+					headers : {
+						"User-Agent" : "Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1"
+					},
+					data : {
+						values : {
+							sessionid : "",
+							password : 'admin123',
+							username : 'tcs_qiye',
+							mobileLogin : 'true',
+							rememberMe : 'true'
+						}
+					}
+				}, function(result, err) {
+					console.log(JSON.stringify(result));
+					if(result)
+					setUser(result.id, result.loginName, "admin123", result.name, result.sessionid);
+				});
+				page = 2;
+				JsonData.pageSize = 10;
+				JsonData.pageNo = 1;
+				JsonData.sessionid = getUser().sessionid;
+				httpClient(TZGG, JsonData, function(result) {
+					stoppull();
+					result.URL = BASE_URL;
+					$('#XWInfo').empty().append(doT.compile($("#XWZX_List").html())(result));
+
+					//新闻详情				
+						$.each(result.page.list, function(n, value) {
+							xq[value.id] = value;
+						});
+
+					
+
+					console.log("--->" + JSON.stringify(result));
+				});
+			});
+			initpull();
+			pullupper(function() {
+				JsonData.pageSize = 10;
+				JsonData.pageNo = page;
+				sessionid = getUser().sessionid;
+				httpClient(TZGG, JsonData, function(result) {
+					stoppull();
+					var sum = (Math.ceil((result.page.count) / 10));
+					if (page > sum) {
+						ts('无更多内容...' + page);
+					} else {
+						console.log("上拉---〉" + JSON.stringify(result));
+						result.URL = BASE_URL;
+						$('#XWInfo').append(doT.compile($("#XWZX_List").html())(result));
+						//新闻详情				
+						$.each(result.page.list, function(n, value) {
+							console.log('--------->'+JSON.stringify(value));
+							xq[value.id] = value;
+						});
+						page++;
+					}
+				});
+				ts('加载中...');
+			});
+		}
+		function openxq(id) {
+		
+				var param = {};
+				param.xq = xq[id];
+				
+				console.log(JSON.stringify(param));
+				openWin('./xq/tzgg_window', param);
+				
+			}
+	</script>
+</html>

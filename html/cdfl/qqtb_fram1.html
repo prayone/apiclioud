@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+		<meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+		<title>title</title>
+		<!--<link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+		<link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>-->
+		<script type="text/javascript" src="../../script/jquery2.min.js"></script>
+		<script type="text/javascript" src="../../script/api.js"></script>
+		<script type="text/javascript" src="../../script/swipe.js"></script>
+		<script type="text/javascript" src="../../script/doT.js"></script>
+		<script type="text/javascript" src="../../script/HttpClient.js"></script>
+		<script type="text/javascript" src="../../script/conf.js"></script>
+		<link href="../../css/iconfont/iconfont.css" rel="stylesheet" />
+		<!--<link href="../../css/Hui.css" rel="stylesheet" type="text/css" />-->
+		<script type="text/javascript" src="../../script/api.js"></script>
+		<script type="text/javascript" src="../../script/conf.js"></script>
+		<link rel="stylesheet" type="text/css" href="./css/styles.css" media="all">
+		<script type="text/javascript" src="./js/jquery.js"></script>
+		<script type="text/javascript" src="./js/moment.js"></script>
+		<script type="text/javascript" src="./js/bootstrap-datetimepicker.js"></script>
+		<link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+		<script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		<script type="text/javascript">
+			$(document).ready(function() {
+				// date time picker
+				if ($(".iDate.full").length > 0) {
+					$(".iDate.full").datetimepicker({
+						locale : "zh-cn",
+						format : "YYYY-MM",
+						dayViewHeaderFormat : "YYYY年 MMMM"
+					});
+				}
+				if ($(".iDate.date").length > 0) {
+					$(".iDate.date").datetimepicker({
+						locale : "zh-cn",
+						format : "YYYY-MM",
+						dayViewHeaderFormat : "YYYY年 MMMM"
+					});
+				}
+			})
+		</script>
+		<style>
+			body {
+				padding: 10px 5px 0 9px;
+				font-size:16px;
+			}
+			.xmmc {
+				font-size: 18px;
+				border-bottom: 1px solid #ddd;
+			}
+			.jssj {
+				margin: 10px 0;
+			}
+			.red {
+				color: red;
+				font-size: 20px;
+				font-weight: bold;
+				text-align: center;
+			}
+			/* .xuanze{
+				overflow:hidden;
+			} */
+			.sele{
+				margin-left:40px;
+				border:1px solid #ccc!important;
+				width:88px;
+				padding: 0 6px!important;
+				background:url("../../img/jiantou.png") center right no-repeat;
+				background-size:20px 20px; 
+				height: 30px!important;
+				float:left;
+				margin-top:5px;
+			}
+			a{
+				text-decoration: none!important;
+			}
+			
+		</style>
+	</head>
+	<body>
+		<div class="xmmc" id="list1"></div>
+		<div class="date" style="overflow: hidden;margin: 10px 0 20px 0;">
+			<div class="aui-list-item-label" style="float: left; margin-top:7px;">
+				建设时间:
+			</div>
+			<div class="aui-list-item-input" style="float:left;margin-left: 40px;">
+				<div class="iDate date" style="">
+					<input type="text" id="rq" >
+					<button type="button" class="addOn"></button>
+				</div>
+			</div>
+		</div>
+		<div class="aui-list-item-label" style="">
+			主要建设内容及形象进度：
+			<textarea style="width:100%;height: 120px;margin-top: 8px;" placeholder="请输入(必填)"></textarea>
+		</div>
+		
+		<div class="aui-list-item-inner" style="">
+			<div  style="width:100%;overflow: hidden;margin: 8px 0 18px 0;">
+				<span style="float:left;margin-top:12px ">投资项目前期工作信息</span>
+				<select class="sele" id="list2" onchange="change()">
+					
+				</select>
+			</div>
+		</div>
+		<div class="xuanze">
+			<p>审批信息:</p>
+			<div id="list3">
+					
+			</div>
+			
+		</div>
+		
+		
+		
+		
+		<div id="wrap">
+			<div id="header">
+				<h1>上传图片demo</h1>
+			</div>
+			<div id="main">
+				<button class="uploadBtn" type="text" onclick="showAction();" style="position: relative;left:50%; margin-left:-50px;width:100px;height:50px;background-color: pink;border:none;">
+					点击上传图片
+				</button>
+				<div class="imgBox" style="position:relative;width:200px;height:200px;border:1px solid red;">
+					<img id="imgUp" style="width:100%;height:100%;" src=""/>
+				</div>
+			</div>
+		</div>
+	</body>
+	
+	<!--select选择下拉框dot.js-->
+	<script type="text/x-dot-template" id="XM_List">
+		<p class="red">{{=it.ydMian.mainid.xmmc}}</p>
+	</script>
+	<script type="text/x-dot-template" id="XM_List2">
+					<option value ="">请选择</option>
+					{{~ it.spxxselect:f:index}}
+					<option value ="{{=f.value}}">{{=f.label}}</option>
+					 {{~}}
+				
+	</script>
+	<script type="text/x-dot-template" id="XM_List3">
+			{{~ it.ydMian.mainid.xmSpxxList:f:index}}
+			<div class="spxx_{{=f.fl}} panel-group" style="margin:0 0 2px 0;">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h4 class="panel-title">
+							<a data-toggle="collapse" href="#collapseOne{{=index}}" id="hh" style="display: block;"> 
+								{{=f.spxx}}
+						    </a>
+						</h4>
+					</div>
+					<div id="collapseOne{{=index}}" class="panel-collapse collapse">
+						<div class="panel-body">
+						    <p>
+								<span>批复文号</span>
+								<input type="text"/>
+							</p>
+							<p>
+								<span>文件名称</span>
+								<input type="text"/>
+							</p>
+							<p>
+								<span>审批时间</span>
+								<input type="text"/>
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			{{~}}	
+	</script>
+	<script type="text/javascript">
+		function change(){
+			  	 $("div[class^='spxx_']").addClass('hide');			  
+			      var fl=($('#list2').val());
+    			  if (typeof(fl)!= "undefined" &&fl!= "") {
+      				$("div[class^='spxx_"+fl+"']").removeClass("hide");
+                  }
+            }
+		apiready = function() {
+			var id = api.pageParam.xmmc;
+			JsonData.id = id;
+			httpClient(QQTB, JsonData, function(result) {
+				$('#list1').empty().append(doT.compile($("#XM_List").html())(result));
+				$('#list2').empty().append(doT.compile($("#XM_List2").html())(result));
+				$('#list3').empty().append(doT.compile($("#XM_List3").html())(result));
+				console.log("---fff>" + JSON.stringify(result));
+				change();
+			});
+		};
+		
+		 // 上传图片
+    function showAction(){
+        api.actionSheet({
+            title: '上传图片',
+            cancelTitle: '取消',
+            buttons: ['拍照','从手机相册选择']
+        }, function(ret, err) {
+            if (ret) {
+            console.log("jjjj"+JSON.stringify(ret))
+                getPicture(ret.buttonIndex);
+            }
+        });
+    }
+    function getPicture(sourceType) {
+        if(sourceType==1){ // 拍照
+            api.getPicture({
+                sourceType: 'camera',
+                encodingType: 'jpg',
+                mediaValue: 'pic',
+                allowEdit: false,
+                destinationType: 'url',
+                quality: 90,        
+                saveToPhotoAlbum: true
+            }, function(ret, err) {
+                if (ret) {
+                   $('#imgUp').attr('src', ret.base64Data);
+                }else {
+                    alert(JSON.stringify(err));
+                }
+            });
+        }
+        else if(sourceType==2){ // 从相机中选择
+            api.getPicture({
+                    sourceType: 'library',
+                    encodingType: 'jpg',
+                    mediaValue: 'pic',
+                    destinationType: 'base64',
+                    quality: 50,
+                    targetWidth: 750,
+                    targetHeight: 750
+                }, function(ret, err) {
+                    if (ret) {
+                           $('#imgUp').attr('src', ret.base64Data)
+                           console.log("srcjjjjjjjjjjjjjjjj"+$('#imgUp').attr('src'))
+                        var aa=ret.base64Data.split(",")[1];
+//                     bsae64转为图片格式
+						var trans = api.require('trans');
+							trans.saveImage({
+    									base64Str: aa,
+    									imgPath:"fs://img/",
+    									imgName:"ss.png"
+							}, function(ret, err) {
+   									 if (ret.status) {
+        								alert(JSON.stringify(ret));
+        								console.log("正确~~~~")
+        								console.log("jpogjjsjsjsjjsj-----------------"+imgPath)
+   								 } else {
+       									 alert(JSON.stringify(err));
+   								 }
+						})
+//                      console.log("jpogjjsjsjsjjsj-----------------"+JSON.stringify(trans))
+                        
+                        var param={};
+                        param.tbyear='2017-09';
+                        param.jsnrMonth="ppppppppppppppp"
+                        api.ajax({
+                            type:"post",
+                            url:"http://192.168.1.195/tc/a/tongchuan/ydjzgl/qqcbkYdSave.json?id=4f67fbbbd1354c58bba91e094e8c4815",
+                            dataType:'json',
+                            async:true,
+                            data : {
+              					files : {
+                					"jztp" : aa,
+              					},
+              						values : param
+           						 },
+                        },function(ret,err){
+                            if(ret){
+                            	
+                               console.log("hhhhhhhssss"+JSON.stringify(ret))
+                            }else{
+                               
+                                console.log("pppppp"+JSON.stringify(err))
+                            }
+                        })
+                    } else {
+                        alert("cccc"+JSON.stringify(err));
+                    }
+            });
+        }
+    }
+    
+	</script>
+</html>

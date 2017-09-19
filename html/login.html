@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+		<meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+		<title>title</title>
+		<link rel="stylesheet" href="../weui/weui.css">
+		<!--<link href="../css/Hui.css" rel="stylesheet" type="text/css" />-->
+		<script src="../weui/jquery-2.1.4.js"></script>
+		<script src="../weui/jquery-weui.js"></script>
+		<script src="../script/conf.js"></script> 
+		<script src="../script/H.js"></script> 
+		<script src="../script/HttpClient.js"></script>
+		<style>
+			body {
+				background: url("../image/login.jpg") no-repeat;
+				z-index: -99 !important;
+				background-size: cover;
+				background-attachment: fixed;
+			}
+			#loginbtn {
+				margin-top: 25px;
+			}
+			.register {
+				height: 45px;
+				line-height: 45px;
+				font-size: 20px;
+				color: #888;
+				font-weight: 800;
+				letter-spacing: 2px;
+			}
+			.weui-cells__title {
+				margin: 0;
+				height: 40px;
+				line-height: 40px;
+				font-size: 15px;
+			}
+			.weui-cell {
+				border: 1px solid #ddd;
+				border-radius: 5px;
+			}
+			.weui-btn {
+				width: 70% !important;
+			}
+			input:focus, input:active:focus, input.active:focus, input.focus, input:active.focus, input.active.focus {
+				outline: none;
+			}
+			.login {
+				background: rgba(255,255,255,0.1);
+			}
+			.header {
+				width: 100%;
+			}
+			.warp{
+				margin-top: 10px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="warp">
+			
+			<div class="weui-cells__title">
+				用户名
+			</div>
+			<div class="weui-cells">
+				<div class="weui-cell">
+					<div class="weui-cell__bd">
+						<input class="weui-input" type="text" id="username" placeholder="请输入用户名" value="">
+					</div>
+				</div>
+			</div>
+			<div class="weui-cells__title">
+				密码
+			</div>
+			<div class="weui-cells">
+				<div class="weui-cell">
+					<div class="weui-cell__bd">
+						<input id="password" class="weui-input" type="password" placeholder="请输入密码" value="">
+					</div>
+				</div>
+			</div>
+			<div class="searchbutton text-center">
+				<button class="weui-btn  weui-btn_primary" id="loginbtn" onclick="gologin();">
+					登陆
+				</button>
+				<button class="weui-btn  weui-btn_warn quxiao" onclick="closeWin();">
+					取消
+				</button>
+			</div>
+		</div>
+	</body>
+	<script type="text/javascript" src="../script/api.js"></script>
+	<script type="text/javascript">
+			function gologin() {
+			api.ajax({
+						url : BASE_URL+"/a/logout",
+						method : 'POST',
+						dataType : 'json',
+						headers : {
+							"User-Agent" : "Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1"
+						}
+					}, function(result, err) {
+					//				H.toastLoading(30000, '正在登录...');
+				var username = $('#username').val();
+				var password = $('#password').val();
+//				if (username == "" || password == "") {
+//					alert('账号或密码不能为空！');
+//					var jzmm = $('#jzmm').is(':checked');
+//				}
+//				if (username.length < 1 || password.length < 1) {
+//					H.closeToast();
+//					alert('账号或密码不能为空！');
+//				} 
+//				else 
+//				{
+					api.parseTapmode();
+					api.ajax({
+						url : LOGINRUL,
+						method : 'POST',
+						dataType : 'json',
+						headers : {
+							"User-Agent" : "Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1"
+						},
+						data : {
+							values : {
+								sessionid : "",
+								password : password,
+								username : username,
+								mobileLogin : 'true',
+								rememberMe : 'true'
+							}
+						}
+					}, function(result, err) {
+					console.log("——————————————————————————————————————————————"+JSON.stringify(result));
+					
+//						if (result) {
+//						console.log("——————————————————————————————————————————————"+JSON.stringify(result));
+//							if ( typeof (result.id) != "undefined") {
+							setUser(result.id, result.loginName, password, result.name, result.sessionid);
+								api.closeToWin({
+    								name: 'root'
+								});
+//								
+//							} else {
+//								alert(result.message);
+//							}
+//						} else {
+//							alert("请检查网络！11111");
+//						}
+						H.closeToast();
+//					};
+				})
+				})
+			
+			
+			
+			
+			
+
+			
+}
+			apiready = function() {
+				api.parseTapmode();
+				 api.addEventListener({
+    				name: 'tbok'
+					}, function(ret, err) {
+					$("#password").val("");
+					});
+				var z = $api.getStorage('jzmm');
+				if (z == 'false') {//上次没记住密码
+					$('#jzmm').attr('checked', false);
+				} else {//上次记住密码
+					$('#jzmm').attr('checked', true);
+				}
+				var u = getUser();
+			
+				if ( typeof (u) != "undefined") {
+					//$("#username").val(u.loginName);
+					//$("#password").val(u.password);
+				}
+				}
+			function closeWin(){
+        api.closeWin({
+        });
+    }		
+		</script>
+</html>

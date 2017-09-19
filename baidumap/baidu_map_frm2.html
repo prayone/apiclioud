@@ -1,0 +1,748 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+		<title>APP</title>
+		<script src="../script/jquery.min.js"></script>
+		<script  src="../script/api.js" type="text/javascript"></script>
+		<script src="../script/HttpClient.js" type="text/javascript"></script>
+		<script src="../script/conf.js" type="text/javascript"></script>
+		<link rel="stylesheet" type="text/css" href="../css/Hui.css"/>
+		<link rel="stylesheet" type="text/css" href="../script/bootstrap.min.css" />
+		<script type="text/javascript" src="../script/doT.js"></script>
+		<script type="text/javascript" src="../script/api.js"></script>
+		<script type="text/javascript" src="../script/HttpClient.js"></script>
+		<script type="text/javascript" src="../script/conf.js"></script>
+		<script type="text/javascript" src="../script/jquery.min.js"></script>
+		<script type="text/javascript" src="../script/bootstrap.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="../html/tjbb/css/styles.css" media="all">
+		<!-- <script src="../html/tjbb/js/jquery.js"></script> -->
+		<script type="text/javascript" src="../html/tjbb/js/moment.js"></script>
+		<script type="text/javascript" src="../html/tjbb/js/bootstrap-datetimepicker.js"></script>
+	</head>
+	<style type="text/css">
+		#ul2 li{
+		float:left;
+		}
+		body {
+			background-color: #ffffff;
+		}
+		a {
+			text-decoration: none;
+		}
+		#bar {
+			position: fixed;
+			top: 0px;
+			width: 100%;
+		}
+		select {
+			/*Chrome和Firefox里面的边框是不一样的，所以复写了一下*/
+			border: solid 1px #000;
+			/*很关键：将默认的select选择框样式清除*/
+			appearance: none;
+			-moz-appearance: none;
+			-webkit-appearance: none;
+			/*在选择框的最右侧中间显示小箭头图片*/
+			background: url("../../../icon/arrow.png") no-repeat scroll right center transparent;
+			/*为下拉小箭头留出一点位置，避免被文字覆盖*/
+			padding-right: 14px;
+		}
+		/*清除ie的默认选择框样式清除，隐藏下拉箭头*/
+		select::-ms-expand {
+			display: none;
+		}
+	</style>
+	<body>
+		<div id="navbar" class="collapse navbar-collapse" style="margin-left: 20px;height:100%;">
+			<ul class="nav navbar-nav navbar-right">
+				
+				<li class="active" style="margin-top:3px">
+					<font style="color: black">年份：</font>
+					<select style="height: 30px;width:90px;border-color:#eeeeee" id="jsnd" class="sele">
+					</select>
+					<button type="button" id="cx" onclick="sousuo();" class="" style="height: 30px;width:70px;">
+						查询
+					</button>
+				</li>
+				<hr/>
+			<br/>	
+			</ul>
+			<ul id="ul2">
+	<li><img src="../image/3.png" width="30px;" height="40px;">产业转型类</li>
+ 	<li><img src="../image/2.png" width="30px;" height="40px;">基础设施类</li>
+ 	<li><img src="../image/1.png" width="30px;" height="40px;">生态民生类</li>
+	
+ 	
+
+
+			</ul>
+		</div>
+	</body>
+	<script type="text/javascript">
+		var isShow = true;
+		function sousuo() {
+			isShow = true;
+			show();
+			//获取数据
+			map.removeAnnotations({
+				ids : bzarray
+			});
+			bzarray = [];
+			
+			JsonData.jsnd= $('#jsnd').val();
+			sessionid = getUser().sessionid;
+			httpClient(BASE_URL+'/a/tongchuan/map/sjldbzxmllist.json', JsonData, function(result) {
+				$.each(result.page, function(n, value) {
+					bzarray.push(n);
+					var kk = (value.position).split(",");
+					var po = [];
+					po.push({
+						'id' : (n + 1),
+						'lon' : kk[0],
+						'lat' : kk[1]
+					});
+					addAnnotations(po, value.xmlb.id, value);
+				});
+				
+			});
+			
+			
+		}
+
+
+		$(document).ready(function() {
+			if ($(".iDate.full").length > 0) {
+				$(".iDate.full").datetimepicker({
+					locale : "zh-cn",
+					format : "YYYY-MM",
+					dayViewHeaderFormat : "YYYY年 MMMM"
+				});
+			}
+			if ($(".iDate.date").length > 0) {
+				$(".iDate.date").datetimepicker({
+					locale : "zh-cn",
+					format : "YYYY-MM",
+					dayViewHeaderFormat : "YYYY年 MMMM"
+				});
+			}
+		});
+	</script>
+	<script type="text/javascript">
+		
+		
+		var winHeight, map, lat = '34.97906', lon = '108.987928';
+		var bzarray = [];
+		apiready = function() {
+						var year=new Date().getFullYear();
+						$('#jsnd').empty();
+						for(i=year-5;i<year+6;i++){
+							if(i==year)
+							$("<option selected = 'selected' value='" + i + "'>" + i + "</option>").appendTo("#jsnd");
+							else
+							$("<option value='" + i + "'>" + i + "</option>").appendTo("#jsnd");
+						}
+						
+			winHeight = api.pageParam.height;
+			api.parseTapmode();
+			map = api.require('bMap');
+			open();
+			showUserLocation();
+			sessionid = getUser().sessionid;
+			httpClient(BASE_URL+'/a/tongchuan/map/sjldbzxmllist.json', JsonData, function(result) {
+				$.each(result.page, function(n, value) {
+					bzarray.push(n);
+					var kk = (value.position).split(",");
+					console.log('kk---------->'+kk);
+					var po = [];
+					po.push({
+						'id' : (n + 1),
+						'lon' : kk[0],
+						'lat' : kk[1]
+					});
+					
+					addAnnotations(po, value.xmlb.id, value);
+				});
+				
+			
+			});
+		};
+		function ss() {
+			if (isShow) {
+				isShow = false;
+				hide();
+			} else {
+				isShow = true;
+				show();
+			}
+		}
+
+		//打开地图
+		function open() {
+			map.open({
+				rect : {
+					x : 0,
+					y : winHeight,
+					w : 'auto',
+					h : api.frameHeight
+				},
+				center : {
+					lon : lon,
+					lat : lat
+				},
+				zoomLevel : 15,
+				showUserLocation : true,
+				fixedOn : '',
+				fixed : true
+			}, function(ret) {
+			});
+		}
+
+		//关闭
+		function close() {
+			map.close();
+			$("#navbar").show();
+		}
+
+		//显示
+		function show() {
+			map.show();
+			$("#navbar").hide();
+		}
+
+		//隐藏
+		function hide() {
+			map.hide();
+			$("#navbar").show();
+		}
+
+		//初始化
+		function restart() {
+			api.toast({
+				msg : '请稍候',
+				duration : 1500,
+				location : 'top'
+			});
+			setTimeout(function() {
+				close();
+				open();
+			}, 1000)
+		}
+
+		//获取坐标
+		function getLocation() {
+			map.getLocation({
+				accuracy : '100m',
+				autoStop : true,
+				filter : 1
+			}, function(ret, err) {
+				if (ret.status) {
+					lat = ret.lat;
+					lon = ret.lon;
+					alert(JSON.stringify(ret));
+				} else {
+					alert(err.code);
+				}
+			});
+		}
+
+		//根据地址查找坐标
+		function getCoordsFromName() {
+			api.showProgress({
+				style : 'default',
+				animationType : 'fade',
+				title : '定位中...',
+				text : '请稍候...',
+				modal : false
+			});
+			map.getCoordsFromName({
+				city : '北京',
+				address : '天安门'
+			}, function(ret, err) {
+				api.hideProgress();
+				if (ret.status) {
+					alert(JSON.stringify(ret));
+				}
+			});
+		}
+
+		/*
+		 *根据坐标查找地址
+		 *获取我的坐标地址
+		 */
+		function getNameFromCoords() {
+			api.showProgress({
+				style : 'default',
+				animationType : 'fade',
+				title : '定位中...',
+				text : '请稍候...',
+				modal : false
+			});
+			map.getNameFromCoords({
+				lon : lon,
+				lat : lat
+			}, function(ret, err) {
+				api.hideProgress();
+				if (ret.status) {
+					alert(JSON.stringify(ret));
+				}
+			});
+		}
+
+		/*
+		 *两点距离
+		 */
+		function getDistance() {
+			api.showProgress({
+				style : 'default',
+				animationType : 'fade',
+				title : '定位中...',
+				text : '请稍候...',
+				modal : false
+			});
+			map.getDistance({
+				start : {
+					lon : lon,
+					lat : lat
+				},
+				end : {
+					lat : 39.915174,
+					lon : 116.403901
+				}
+			}, function(ret) {
+				api.hideProgress();
+				if (ret.status) {
+					alert("距离天安门约：" + ret.distance + "米");
+				}
+			});
+		}
+
+		/*
+		 *setCenter
+		 *设置地图中心点
+		 */
+		function setCenter() {
+			api.toast({
+				msg : '定位中',
+				duration : 1500,
+				location : 'top'
+			});
+			map.setCenter({
+				coords : {
+					lon : lon,
+					lat : lat
+				},
+				animation : false
+			});
+		}
+
+		/*
+		 *showUserLocation
+		 *显示用户位置
+		 */
+		function showUserLocation() {
+			api.toast({
+				msg : '定位中',
+				duration : 1500,
+				location : 'top'
+			});
+			map.showUserLocation({
+				isShow : true,
+				trackingMode : 'none'
+			});
+			//缩放一下
+			setZoomLevel();
+		}
+
+		/*
+		 *setZoomLevel
+		 *设置缩放等级
+		 */
+		function setZoomLevel() {
+			map.setZoomLevel({
+				level : 12
+			});
+		}
+
+		/*
+		 *setRotation
+		 *设置旋转角度
+		 */
+		function setRotation() {
+			map.setRotation({
+				degree : 90
+			});
+		}
+
+		/*
+		 *setOverlook
+		 *设置俯视角度
+		 */
+		function setOverlook() {
+			map.setOverlook({
+				degree : -30
+			});
+		}
+
+		/*
+		 *setScaleBar
+		 *比例尺
+		 */
+		function setScaleBar() {
+			map.setScaleBar({
+				show : true,
+				position : {
+					x : 0,
+					y : 0
+				}
+			});
+		}
+
+		/*
+		 *setCompass
+		 *指南针位置
+		 */
+		function setCompass() {
+			map.setCompass({
+				position : {
+					x : 50,
+					y : 50
+				}
+			});
+		}
+
+		/*
+		 *setTraffic
+		 *交通路况
+		 */
+		function setTraffic() {
+			map.setTraffic({
+				traffic : true
+			});
+		}
+
+		/*
+		 *setHeatMap
+		 *设置当前城市为热力图
+		 */
+		function setHeatMap() {
+			map.setHeatMap({
+				heatMap : true
+			});
+			map.setZoomLevel({
+				level : 13
+			});
+		}
+
+		/*
+		 *setBuilding
+		 *是否显示3d
+		 */
+		function setBuilding() {
+			map.setBuilding({
+				building : true
+			});
+			alert('设置成功，放大地图查看效果');
+		}
+
+		/*
+		 *setRegion
+		 *设置地图显示范围（矩形区域）
+		 */
+		function setRegion() {
+			map.setRegion({
+				lbLon : 116.027143,
+				lbLat : 39.772348,
+				rtLon : 116.832025,
+				rtLat : 40.126349,
+				animation : true
+			});
+		}
+
+		/*
+		 *transCoords
+		 *坐标转换
+		 */
+		function transCoords() {
+			alert('注意该方法需要重写加入mcode');
+			map.transCoords({
+				type : "common",
+				lon : 116.351,
+				lat : 39.283,
+				mcode : '0B:13:25:D7:85:46:0A:67:12:F3:29:88:64:56:63:10:7A:9C:C4:59;com.apicloud.A6985734480360'
+			}, function(ret, err) {
+				alert(JSON.stringify(ret));
+			});
+		}
+
+		/*
+		 *addEventListener
+		 *监听事件
+		 */
+		/*
+		 function addEventListener(){
+		 alert("将会监听地图双击事件,请双击地图");
+		 map.addEventListener({
+		 name: 'dbclick'
+		 },function(ret){
+		 if(ret.status){
+		 alert(JSON.stringify(ret));
+		 }
+		 });
+		 }
+		 */
+		/*
+		 *停止监听
+		 */
+		/*   function removeEventListener(){
+		 map.removeEventListener({
+		 name: 'dbclick'
+		 });
+		 alert("已取消监听双击事件");
+		 } */
+		/*
+		 *addAnnotations
+		 *添加标注信息
+		 */
+		function addAnnotations(po, t, obj) {
+			//alert("该方法封装了标注点击弹出气泡"+po);
+			map.addAnnotations({
+				annotations : po,
+				icon : 'widget://image/' + t + '.png',
+				draggable : true
+			}, function(ret) {
+				if (ret) {
+					//设置点击标注时弹出的气泡信息
+					map.setBubble({
+						id : ret.id,
+						content : {
+							title : obj.xmmc,
+							subTitle : '责任单位:' + obj.zrdw.name,
+							illus : 'widget://image/liulangnan2.jpg'
+						},
+						styles : {
+							titleColor : '#009900',
+							titleSize : 14,
+							subTitleColor : '#999',
+							subTitleSize : 12,
+							illusAlign : 'left'
+						}
+					}, function(ret) {
+						if (ret) {
+							// alert(JSON.stringify(ret));
+						}
+					});
+				}
+			});
+			map.setCenter({
+				coords : {
+					lon : 108.877967,
+					lat : 34.96423
+				},
+				animation : false
+			});
+		}
+
+		/*
+		 *addBillboard
+		 *添加布告牌
+		 */
+		function addBillboard() {
+			//设置下中心点
+			setCenter();
+			map.addBillboard({
+				id : 4,
+				coords : {
+					lon : lon,
+					lat : lat
+				},
+				bgImg : 'widget://image/mapbg2.png',
+				content : {
+					title : '大标题大标题大标题大标题',
+					subTitle : '概述内容概述内容概述内容',
+					illus : 'widget://image/liulangnan2.jpg'
+				},
+				styles : {
+					titleColor : '#009900',
+					titleSize : 14,
+					subTitleColor : '#999',
+					subTitleSize : 12,
+					illusAlign : 'left'
+				}
+			}, function(ret) {
+				if (ret) {
+					alert(JSON.stringify(ret));
+				}
+			});
+		}
+
+		/*
+		 *searchRoute
+		 *搜索路线方案
+		 */
+		function searchRoute() {
+			api.showProgress({
+				style : 'default',
+				animationType : 'fade',
+				title : '搜索中...',
+				text : '请稍候...',
+				modal : false
+			});
+			map.searchRoute({
+				id : 1,
+				type : 'walk', //drive（开车）,transit（公交） walk（步行）
+				policy : 'ecar_fee_first',
+				start : {
+					lon : 108.7141544932057,
+					lat : 34.36174121320137
+				},
+				end : {
+					lon : 108.73247992560924,
+					lat : 34.3
+				}
+			}, function(ret, err) {
+				if (ret.status) {
+					api.alert({
+						msg : JSON.stringify(ret)
+					});
+					console.log(JSON.stringify(ret));
+					drawRoute(1);
+				}
+				api.hideProgress();
+			});
+		}
+
+		/*
+		 *绘制路线（安卓）
+		 */
+		function drawRoute(id) {
+			map.searchRoute({
+				type : 'drive',
+				policy : 'ecar_fee_first',
+				start : {
+					lon : 116.403838,
+					lat : 39.914437
+				},
+				end : {
+					lon : 116.384852,
+					lat : 39.989576
+				}
+			}, function(ret, err) {
+				if (ret.status) {
+					map.drawRoute({
+						id : id,
+						index : 0,
+						styles : {
+							start : {
+								icon : 'widget://image/mark_start.png'
+							},
+							end : {
+								icon : 'widget://image/mark_end.png'
+							}
+						}
+					}, function(ret) {
+						api.alert({
+							msg : JSON.stringify(ret)
+						});
+					});
+				} else {
+					api.alert({
+						msg : JSON.stringify(err)
+					});
+				}
+			});
+		}
+
+		/*移除指定的路线*/
+		function removeRoute() {
+			map.removeRoute({
+				ids : [1]
+			});
+		}
+
+		/*
+		 *searchInCity
+		 *根据单个关键字搜索兴趣点
+		 */
+		function searchInCity() {
+			api.showProgress({
+				style : 'default',
+				animationType : 'fade',
+				title : '搜索中...',
+				text : '请稍候...',
+				modal : false
+			});
+			map.searchInCity({
+				city : '北京',
+				keyword : '学校',
+				pageIndex : 0,
+				pageCapacity : 20
+			}, function(ret) {
+				api.hideProgress();
+				if (ret.status) {
+					alert(JSON.stringify(ret.results));
+					var results = ret.results;
+					for (var i in results) {
+						map.addAnnotations({
+							annotations : [{
+								id : results[i].uid,
+								lon : results[i].lon,
+								lat : results[i].lat
+							}],
+							icon : 'widget://image/mark.png',
+							draggable : true
+						}, function(ret) {
+							if (ret) {
+							}
+						});
+					}
+					map.setCenter({
+						coords : {
+							lon : results[1].lon,
+							lat : results[1].lat
+						},
+						animation : false
+					});
+				} else {
+					alert(JSON.stringify(err));
+				}
+			});
+		}
+
+		/*
+		 *searchNearby
+		 *圆形区域内搜索兴趣点
+		 */
+		function searchNearby() {
+			map.searchNearby({
+				keyword : 'KTV',
+				lon : 116.384767,
+				lat : 39.989539,
+				radius : 2000
+			}, function(ret, err) {
+				if (ret.status) {
+					alert(JSON.stringify(ret));
+				} else {
+					alert(JSON.stringify(err));
+				}
+			});
+		}
+
+		/*
+		 *autocomplete
+		 *根据关键字返回建议搜索关键字
+		 */
+		function autocomplete() {
+			map.autocomplete({
+				keyword : '北京西站',
+				city : '北京'
+			}, function(ret) {
+				if (ret.status) {
+					alert(JSON.stringify(ret.results));
+				} else {
+					alert(JSON.stringify(err));
+				}
+			});
+		}
+	</script>
+</html>

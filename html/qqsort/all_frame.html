@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+		<meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+		<title>title</title>
+		<link rel="stylesheet" type="text/css" href="../css/api.css"/>
+		<style>
+			body {
+			}
+			.all{
+				overflow:hidden;
+				padding:0 10px;
+			}
+			.xmgs {
+				width: 135px;
+				height: 60px;
+				line-height:60px;
+				background-color: #9ABC32;
+				float:left;
+				/*margin-left:10px;*/
+				padding-left:10px;
+				color:#fff;
+			}
+			.gstz {
+				width: 155px;
+				height: 60px;
+				line-height:60px;
+				background-color:#6FB3E0;
+				float:left;
+				color:#fff;
+				margin-left:10px;
+				padding-left:10px;
+			}
+			
+			.sort1{
+				text-align: center;
+				border:1px solid #eee;
+				box-shadow:0 0 10px 5px #aaa;
+				width:250px;
+				padding:30px 0;
+				margin:30px auto;
+			}
+			.title{
+				font-size:22px;
+				color:#0062CC;
+			}
+			.img{
+				
+			}
+			.vv{
+				color:#888;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="all" id="list2">
+			
+		</div>
+		<div class="sort" id="list1">
+			
+			
+		</div>
+	</body>
+	<script type="text/javascript" src="../../script/api.js"></script>
+	<script type="text/javascript" src="../../script/doT.js"></script>
+	<script type="text/javascript" src="../../script/swipe.js"></script>
+	<script type="text/javascript" src="../../script/HttpClient.js"></script>
+	<script type="text/javascript" src="../../script/jquery2.min.js"></script>
+	<script type="text/javascript" src="../../script/conf.js"></script>
+	<script type="text/x-dot-template" id="XM_List">
+			{{~ it.list:f:index}}
+			<div class="sort1" onclick="dakai('{{=f.xmlb.id}}')">
+				<img src="../../img/cy.png" alt="" />
+				<p class="title">{{=f.xmlb.name}}</p>
+				<p class="vv">项目数量：{{=f.sort}}个</p>
+				<p class="vv">概算投资：{{=f.ztz}}亿元</p>
+			</div>
+			{{~}}
+		</script>
+		<script type="text/x-dot-template" id="XM_List1">
+			<div class="xmgs">
+				项目个数：{{=it.EntityOne.sort}}个
+			</div>
+			<div class="gstz">
+				概算投资：{{=it.EntityOne.ztz}}亿元
+			</div>
+		</script>
+	<script type="text/javascript">
+	
+			var xq = {}, page = 2, username, password;
+			apiready = function() {
+			
+				api.parseTapmode();
+				pulldown(function() {
+					if ( typeof (getUser()) != "undefined" && typeof (getUser().loginName) != "undefined") {
+						username = getUser().loginName;
+						password = getUser().password;
+					} else {
+						username = "tcs_qiye";
+						password = 'admin123';
+					}
+					api.ajax({
+						url : LOGINRUL,
+						method : 'POST',
+						dataType : 'json',
+						headers : {
+							"User-Agent" : "Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1"
+						},
+						data : {
+							values : {
+								sessionid : "",
+								password : password,
+								username : username,
+								mobileLogin : 'true',
+								rememberMe : 'true'
+							}
+						}
+					}, function(result, err) {
+					
+					if(result)
+						setUser(result.id, result.loginName, password, result.name, result.sessionid);
+						console.log(JSON.stringify(result));
+//						sessionid = result.sessionid;
+						JsonData.sessionid = sessionid;
+						page = 2;
+						JsonData.pageSize = 10;
+						JsonData.pageNo = 1;
+						httpClient(CHBZSort, JsonData, function(result) {
+							stoppull();
+							result.URL = BASE_URL;
+							$('#list1').empty().append(doT.compile($("#XM_List").html())(result));
+                             $('#list2').empty().append(doT.compile($("#XM_List1").html())(result));
+							console.log("dededeeeee>" + JSON.stringify(result)); 
+//							console.log("-------------->" + result.list[0].id);
+							
+						});
+					});
+				});
+				initpull();
+
+				
+			}
+		
+		function dakai(id){
+			
+			if(id=="caf6d7d58a8a4013be7c63fb48a9cb12"){
+				var dx={};
+				dx.xmlbid=id;
+				openWin("./cyzx_win", dx);
+			}else if(id=="768e719dd8d1490db0e918403a99ad74"){
+				var dx={};
+				dx.xmlbid=id;
+				openWin("./jcss_win", dx);
+				
+			}else if(id=="4afa7b6e53a14e59b7fa3ae3cbbe4cb5"){
+				var dx={};
+				dx.xmlbid=id;
+				openWin("./stms_win", dx);
+			}
+			console.log("ididididiidididididiidididididiididi"+id)
+		}
+		
+
+//		function dakai(id){
+//			var dx={};
+//			dx.xmlbid=id;
+//			openWin('../qqxm/chbz_window',dx);
+//		}
+		
+
+	</script>
+</html>

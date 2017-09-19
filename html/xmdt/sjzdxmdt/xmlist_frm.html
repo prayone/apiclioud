@@ -1,0 +1,195 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+		<meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+		<script type="text/javascript" src="http://api.map.baidu.com/api?key=&v=1.2&services=true"></script>
+		<title>Hui</title>
+		<style>
+			a {
+				text-decoration: none;
+			}
+			#bar {
+				position: fixed;
+				top: 0px;
+				width: 100%;
+			}
+			select {
+				/*Chrome和Firefox里面的边框是不一样的，所以复写了一下*/
+				border: solid 1px #000;
+				/*很关键：将默认的select选择框样式清除*/
+				appearance: none;
+				-moz-appearance: none;
+				-webkit-appearance: none;
+				/*在选择框的最右侧中间显示小箭头图片*/
+				background: url("../../../icon/arrow.png") no-repeat scroll right center transparent;
+				/*为下拉小箭头留出一点位置，避免被文字覆盖*/
+				padding-right: 14px;
+			}
+			/*清除ie的默认选择框样式清除，隐藏下拉箭头*/
+			select::-ms-expand {
+				display: none;
+			}
+			/* .zt{
+			 font-size:16px;
+			 } */
+		</style>
+		<link rel="stylesheet" type="text/css" href="../../../css/api.css"/>
+		<link rel="stylesheet" type="text/css" href="../../../css/Hui.css"/>
+		<link rel="stylesheet" type="text/css" href="../../../script/bootstrap.min.css" />
+		<script type="text/javascript" src="../../../script/H.js"></script>
+		<script type="text/javascript" src="../../../script/doT.js"></script>
+		<script type="text/javascript" src="../../../script/api.js"></script>
+		<script type="text/javascript" src="../../../script/HttpClient.js"></script>
+		<script type="text/javascript" src="../../../script/conf.js"></script>
+		<script type="text/javascript" src="../../../script/jquery2.min.js"></script>
+		<script type="text/javascript" src="../../../script/bootstrap.min.js"></script>
+		<script type="text/javascript">
+			var xq = {}, page = 2;
+			apiready = function() {
+				
+				sessionid = getUser().sessionid;
+				httpClient('http://www.edu029.net/tongchuan/a/tongchuan/map/sjzdjsxmklist.json', JsonData, function(result) {
+					$.each(result.page, function(n, value) {
+						if ( typeof (value.position) != "undefined" && value.position != "") {
+							addMakerPoint(value.xmmc, value.position, value.zrdw.name, value.ztz, value.xmmc);
+							console.log('|||||||||||||||||||||||||->'+value.position);
+						}
+					});
+				});
+			};
+			function openxq(id) {
+				var param = {};
+				param.nd = JsonData.year;
+				param.xmid = id;
+				openWin('./xq_win', param);
+			}
+
+			function ss() {
+				$('#ssan').click();
+			}
+
+			function sousuo() {
+				H.toastLoading(30000, '搜索中...');
+				($('#jsnd').val() == null) ? JsonData.year = jsnd : JsonData.year = $('#jsnd').val();
+				JsonData.pageSize = 10;
+				JsonData.pageNow = 1;
+				JsonData.action = 'reserve_noau_list';
+				sessionid = getUser().sessionid;
+				page = 2;
+				JsonData.xmmc = $('#xmmc').val();
+				($('#dutyUnit').val() == null) ? JsonData.zrzt = "" : JsonData.zrzt = $('#dutyUnit').val();
+				($('#xmlb').val() == null) ? JsonData.xmlb = "" : JsonData.xmlb = $('#xmlb').val();
+				JsonData.action = 'project_Allmap';
+				JsonData.dwlx = 0;
+				JsonData.nd = $('#jsnd').val();
+				JsonData.zrdw = $('#dutyUnit').val();
+				JsonData.xmlb = $('#xmlb').val();
+				httpClient(BASE_URL, JsonData, function(result) {
+				H.closeToast();
+					$.each(result.data.array, function(n, value) {
+						if ( typeof (value.lng) != "undefined" && value.lng != "") {
+							addMakerPoint(value.xmmc, value.lng + ',' + value.lat, value.dwmc, value.ztz, value.xmmc);
+						}
+					});
+				});
+			}
+		</script>
+	</head>
+	<body>
+		<div id="navbar" class="collapse navbar-collapse" style="margin-left: 20px;">
+			<ul class="nav navbar-nav navbar-right">
+				<li class="active">
+					<font style="color: black">建设年度：</font>
+					<select style="height: 30px;width:66px;border-color:#eeeeee" id="jsnd" class="sele"></select>
+					<button type="button" id="cx" onclick="sousuo();" class="mui-btn mui-btn-primary" style="height: 30px;">
+						查询
+					</button>
+				</li>
+				
+				<hr/>
+			</ul>
+		</div>
+		<div id="mui-scroll" style=""></div>
+		<div class="boxmap" id="container" style="min-height:500px;width:98%;"></div>
+		<a href="#" data-toggle="collapse" data-target="#navbar" id="ssan" style="display: none;">搜索</a>
+		<script type="text/javascript">
+			var map = new BMap.Map("container");
+			//创建Map实例
+			var point = new BMap.Point(108.987928,34.97906);
+			//创建点坐标
+			map.centerAndZoom(point, 12);
+			//初始化地图,设置中心点坐标和地图级别。
+			map.addEventListener("click", function(e) {
+				//  alert(e.point.lng + "," + e.point.lat);
+			});
+			//        a,项目名称。b.经纬度，c.责任单位，d.总投资，e.项目类别
+			function addMakerPoint(a, b, c, d, e) {
+				var point1 = new BMap.Point(b.split(',')[0], b.split(',')[1]);
+				var _marker = new BMap.Marker(point1);
+				var opts = {
+					width : 250, // 信息窗口宽度.
+					height : 150, // 信息窗口高度
+					title : "项目信息"	// 信息窗口标题
+				}
+				if (e == "西安市") {
+					var icons = BASE_URL + "/static/kpimp/mapImage/1.png";
+					//这个是你要显示坐标的图片的相对路径
+				} else if (e == "铜川市") {
+					var icons = BASE_URL + "/static/kpimp/mapImage/2.png";
+					//这个是你要显示坐标的图片的相对路径
+				} else if (e == "宝鸡市") {
+					var icons = BASE_URL + "/static/kpimp/mapImage/3.png";
+					//这个是你要显示坐标的图片的相对路径
+				} else if (e == "咸阳市") {
+					var icons = BASE_URL + "/static/kpimp/mapImage/4.png";
+					//这个是你要显示坐标的图片的相对路径
+				} else if (e == "杨陵区") {
+					var icons = BASE_URL + "/static/kpimp/mapImage/5.png";
+					//这个是你要显示坐标的图片的相对路径
+				} else if (e == "渭南市") {
+					var icons = BASE_URL + "/static/kpimp/mapImage/6.png";
+					//这个是你要显示坐标的图片的相对路径
+				} else if (e == "韩城市") {
+					var icons = BASE_URL + "/static/kpimp/mapImage/7.png";
+					//这个是你要显示坐标的图片的相对路径
+				} else if (e == "延安市") {
+					var icons = BASE_URL + "/static/kpimp/mapImage/8.png";
+					//这个是你要显示坐标的图片的相对路径
+				} else if (e == "汉中市") {
+					var icons = BASE_URL + "/static/kpimp/mapImage/9.png";
+					//这个是你要显示坐标的图片的相对路径
+				} else if (e == "榆林市") {
+					var icons = BASE_URL + "/static/kpimp/mapImage/10.png";
+					//这个是你要显示坐标的图片的相对路径
+				} else if (e == "安康市") {
+					var icons = BASE_URL + "/static/kpimp/mapImage/11.png";
+					//这个是你要显示坐标的图片的相对路径
+				} else if (e == "商洛市") {
+					var icons = BASE_URL + "/static/kpimp/mapImage/12.png";
+					//这个是你要显示坐标的图片的相对路径
+				} else if (e == "西咸新区") {
+					var icons = BASE_URL + "/static/kpimp/mapImage/13.png";
+					//这个是你要显示坐标的图片的相对路径
+				} else {
+					var icons = "../../../image/green_1.png";
+					//这个是你要显示坐标的图片的相对路径
+				}
+				var icon = new BMap.Icon(icons, new BMap.Size(30, 30));
+				//显示图标大小
+				_marker.setIcon(icon);
+				//设置标签的图标为自定义图标
+				var _iw = new BMap.InfoWindow("项目名称：" + a + "<br/>总投资：" + d + "<br/>责任单位：" + c, opts);
+				_marker.addEventListener("click", function() {
+					this.openInfoWindow(_iw);
+				});
+				var label = new BMap.Label(a, {
+					"offset" : new BMap.Size(0, -20)
+				});
+				_marker.setLabel(label);
+				map.addOverlay(_marker);
+			}
+		</script>
+	</body>
+</html>

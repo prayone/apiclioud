@@ -1,0 +1,149 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+		<meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+		<title>AUI快速完成布局</title>
+		<link rel="stylesheet" type="text/css" href="../css/aui.css" />
+		<style type="text/css">
+			.text-white {
+				color: #ffffff !important;
+			}
+			/* .aui-grid [class*=aui-col-] {
+			 padding: 0.75rem 0;
+			 }*/
+			.txt{
+				background-color:#f5f5f5!important;
+				font-size:20px;
+				color:#666;
+				margin-top:20px;
+				text-align: center;
+			}
+			.righ{
+				margin-left: 45px;
+			}
+		</style>
+	</head>
+	<script type="text/x-dot-template" id="T_newList">
+		<li class="aui-list-item">
+		<div class="aui-list-item-label-icon">
+		<i class="aui-iconfont aui-icon-user aui-text-info"></i>
+		</div>
+		<div class="aui-list-item-inner aui-list-item-arrow">
+		<div class="aui-list-item-title">欢迎：{{=it.user.name}}</div>
+		</div>
+		</li>
+		<li class="aui-list-item">
+		<div class="aui-list-item-label-icon">
+		<i class="aui-iconfont aui-icon-user aui-text-info"></i>
+		</div>
+		<div class="aui-list-item-inner aui-list-item-arrow">
+		<div class="aui-list-item-title">本次登录时间：{{=it.user.loginDate}}</div>
+		</div>
+		</li>
+		<li class="aui-list-item">
+		<div class="aui-list-item-label-icon">
+		<i class="aui-iconfont aui-icon-user aui-text-info"></i>
+		</div>
+		<div class="aui-list-item-inner aui-list-item-arrow">
+		<div class="aui-list-item-title">上次登录时间：{{=it.user.oldLoginDate}}</div>
+		</div>
+		</li>
+		<li class="aui-list-item">
+		<div class="aui-list-item-label-icon">
+		<i class="aui-iconfont aui-icon-user aui-text-info"></i>
+		</div>
+		<div class="aui-list-item-inner aui-list-item-arrow">
+		<div class="aui-list-item-title">本次登录IP：{{=it.user.loginIp}}</div>
+		</div>
+		</li>
+		<li class="aui-list-item">
+		<div class="aui-list-item-label-icon">
+		<i class="aui-iconfont aui-icon-user aui-text-info"></i>
+		</div>
+		<div class="aui-list-item-inner aui-list-item-arrow">
+		<div class="aui-list-item-title">上次登录IP：{{=it.user.oldLoginIp}}</div>
+		</div>
+		</li>
+		<li class="aui-list-item">
+		<div class="aui-list-item-label-icon">
+		<i class="aui-iconfont aui-icon-user aui-text-info"></i>
+		</div>
+		<div class="aui-list-item-inner aui-list-item-arrow">
+		<div class="aui-list-item-title">所属单位：{{=it.user.roleNames}}</div>
+		</div>
+		</li>
+		
+		<i class="aui-iconfont aui-icon-user aui-text-info"></i>
+		</div>
+		<div class="aui-list-item-inner aui-list-item-arrow">
+		<div class="aui-list-item-title aui-pull-right righ"  onclick="logout()">退出登录</div>
+		</div>
+		</li>
+	</script>
+	<script type="text/javascript" src="../script/api.js" ></script>
+	<script type="text/javascript" src="../script/HttpClient.js" ></script>
+	<script type="text/javascript" src="../script/conf.js" ></script>
+	<script type="text/javascript" src="../script/jquery2.min.js" ></script>
+	<script type="text/javascript" src="../script/doT.js"></script>
+	<script type="text/javascript">
+		apiready = function() {
+		
+			if(typeof(getUser())!="undefined"){
+			var username=getUser().loginName;
+			sessionid = getUser().sessionid;
+			
+			if (username=="tcs_qiye"||typeof(username)=="undefined") {
+			var str='<div class="txt" onclick="openWin(\'./login_win\',\'\');">您好,请点我登录！</div>';
+						$('#mui-scroll').html(str);
+				
+			} else {
+				  		httpClient(GRXX, JsonData, function(result) {
+					console.log('result---->' + JSON.stringify(result));
+					$('#mui-scroll').empty().append(doT.compile($("#T_newList").html())(result));
+				});
+			}
+			
+			}
+			else {
+				var str='<div class="txt" onclick="openWin(\'./login_win\',\'\');">您好,请点我登录！</div>';
+						$('#mui-scroll').html(str);
+			}
+		
+			
+		}
+		function tc() {
+			api.closeToWin({
+				name : 'root'
+			});
+		}
+		
+		function logout(){
+			$api.clearStorage();
+			api.ajax({
+						url : BASE_URL+"/a/logout",
+						method : 'POST',
+						dataType : 'json',
+						headers : {
+							"User-Agent" : "Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1"
+						},
+						data : {
+						
+						}
+					}, function(result, err) {
+					
+					api.closeToWin({
+	            name: 'root'
+            });
+					});
+		}
+	</script>
+	<body>
+		<!-- 顶部 -->
+		<section class="aui-content">
+			<ul class="aui-list aui-list-in aui-margin-b-15" id="mui-scroll"></ul>
+		</section>
+		
+	</body>
+</html>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+		<meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+		<title>title</title>
+		<link rel="stylesheet" type="text/css" href="../css/api.css"/>
+		<style>
+			body {
+			}
+			.all{
+				overflow:hidden;
+				padding:0 10px;
+			}
+			.xmgs {
+				width: 135px;
+				height: 60px;
+				line-height:60px;
+				background-color: #9ABC32;
+				float:left;
+				margin-left:10px;
+				padding-left:10px;
+				color:#fff;
+			}
+			.gstz {
+				width: 155px;
+				height: 60px;
+				line-height:60px;
+				background-color:#6FB3E0;
+				float:left;
+				color:#fff;
+				padding-left:10px;
+			}
+			.sort1{
+				text-align: center;
+				border:1px solid #eee;
+				box-shadow:0 0 10px 5px #aaa;
+				width:250px;
+				padding:30px 0;
+				margin:30px auto;
+			}
+			.title{
+				font-size:22px;
+				color:#0062CC;
+			}
+			.img{
+				
+			}
+			.vv{
+				color:#888;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="all" id="list2">
+			
+		</div>
+		<div class="sort" id="list1">
+			
+			
+		</div>
+	</body>
+	<script type="text/javascript" src="../../script/api.js"></script>
+	<script type="text/javascript" src="../../script/doT.js"></script>
+	<script type="text/javascript" src="../../script/swipe.js"></script>
+	<script type="text/javascript" src="../../script/HttpClient.js"></script>
+	<script type="text/javascript" src="../../script/jquery2.min.js"></script>
+	<script type="text/javascript" src="../../script/conf.js"></script>
+	<script type="text/x-dot-template" id="XM_List">
+			{{~ it.list:f:index}}
+			<div class="sort1" onclick="dakai('{{=f.remarks}}')">
+				<img src="../../img/cy.png" alt="" />
+				<p class="title">{{=f.remarks}}</p>
+				<p class="vv">项目数量：{{=f.sort}}个</p>
+				<p class="vv">总投资：{{=f.ztz}}亿元</p>
+				<p class="vv">年计划投资：{{=f.njhtz}}亿元</p>
+			</div>
+			{{~}}
+			
+			
+			{{~ it.hylist:f:index}}
+			<div class="sort1" onclick="dakai2('{{=f.xmlb.id}}')">
+				<img src="../../img/cy.png" alt="" />
+				<p class="title">{{=f.xmlb.name}}</p>
+				<p class="vv">项目数量：{{=f.sort}}个</p>
+				<p class="vv">总投资：{{=f.ztz}}亿元</p>
+				<p class="vv">年计划投资：{{=f.njhtz}}亿元</p>
+			</div>
+			{{~}}
+			
+		</script>
+		<script type="text/x-dot-template" id="XM_List1">
+			<div class="xmgs">
+				项目个数：{{=it.firstList.sort}}个
+			</div>
+			<div class="gstz">
+				概算投资：{{=it.firstList.ztz}}亿元
+			</div>
+		</script>
+	<script type="text/javascript">
+	
+			var xq = {}, page = 2, username, password;
+			apiready = function() {
+			
+				api.parseTapmode();
+				pulldown(function() {
+					if ( typeof (getUser()) != "undefined" && typeof (getUser().loginName) != "undefined") {
+						username = getUser().loginName;
+						password = getUser().password;
+					} else {
+						username = "tcs_qiye";
+						password = 'admin123';
+					}
+					api.ajax({
+						url : LOGINRUL,
+						method : 'POST',
+						dataType : 'json',
+						headers : {
+							"User-Agent" : "Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1"
+						},
+						data : {
+							values : {
+								sessionid : "",
+								password : password,
+								username : username,
+								mobileLogin : 'true',
+								rememberMe : 'true'
+							}
+						}
+					}, function(result, err) {
+					//看这个打印东西了么 ，   我自己试试，没办法调试你的。
+						if(result)
+						setUser(result.id, result.loginName, password, result.name, result.sessionid);
+						console.log(JSON.stringify(result));
+//						sessionid = result.sessionid;
+						JsonData.sessionid = sessionid;
+						page = 2;
+						JsonData.pageSize = 10;
+						JsonData.pageNo = 1;
+						httpClient(BASE_URL+'/a/tongchuan/zjzdk/sjzdkSumlist.json', JsonData, function(result) {
+							stoppull();
+							result.URL = BASE_URL;
+							$('#list1').empty().append(doT.compile($("#XM_List").html())(result));
+							$('#list2').empty().append(doT.compile($("#XM_List1").html())(result));
+							console.log("--->" + JSON.stringify(result)); 
+						});
+					});
+				});
+				initpull();	
+			}
+		function dakai(id){
+			var dx={};
+			if(id=='新建')
+			dx.jsxz='01';
+			else dx.jsxz='02';
+			openWin('../zjxm/sjzd_window',dx);
+		}
+		
+		function dakai2(id){
+			var dx={};
+			dx.xmlbid=id;
+			openWin('../zjxm/sjzd_window',dx);
+		}
+	</script>
+</html>
